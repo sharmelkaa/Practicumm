@@ -1,46 +1,24 @@
-# easy = '10 + 0x1'
-# for sym in easy.split():
-#     if sym in ['+', '-', '*', '/',  '**']:
-#         pass
-#         #  функции для каждого кто что вычисляет
-#     elif sym.isdigit():
-#         pass
-#         #  интуем
-#     elif sym[:2] == '0o':
-#         pass
-#         #  конвертируем в инт
-#     elif sym[:2] == '0x':
-#         pass
-#         #  конвертируем в инт
-#     else:
-#         pass
-#         #  исключение, валидация
-
-
-# example = '2 * ((2 + 2) * 2 ** (1 + 0o3))'
-# print(example.split())
-# new = []
-# index_start = 0
-# start = 0
-# for i_sym in range(0, len(example)):
-#     if example[i_sym].isdigit():
-#         if example[i_sym] == 0:
-#             if example[i_sym+1] == 'o':
-#
-#             elif example[i_sym] == 'x':
-#
-#
-#     elif sym in ['+', '-', '*', '/',  '**']:
-#         pass
-#     else:
-#         new.append(sym)
-# print(new)
-
-easy = '10+ 0x1**2'
+# easy = '10+ 0x1**2'
 # easy = '2 * ((2 + 2) * 2 ** (1 + 0o3))'
+easy = '2 + 10**2 - 5 * 3**4'
 num = ''
-priority = {'**': 1, '*': 2, '/': 2, '+': 3, '-': 3}
-for index in range(0, len(easy)):
+
+def calculate(a, b, operation): # перевод строки-оператора в вычисления
+    result = None
+    if operation == '+':
+        result = a + b
+    elif operation == '-':
+        result = a - b
+    elif operation == '/':
+        result = a / b
+    elif operation == '*':
+        result = a * b
+    elif operation == '**':
+        result = a ** b
+    return result
+
+
+for index in range(0, len(easy)):  # преобразую исходную строку в список символов
     if easy[index].isdigit() or easy[index] in 'xo':
         num += easy[index]
     elif easy[index] == ' ':
@@ -53,16 +31,66 @@ for index in range(0, len(easy)):
     else:
         num += f' {easy[index]} '
 print(num.split())
-a = num.split()
-for ssym in range(0, len(a)):
-    if a[ssym].isdigit():
-        a[ssym] = int(a[ssym])
-    elif a[ssym].startswith('0x'):
-        a[ssym] = int(a[ssym], 16)
-    elif a[ssym].startswith('0o'):
-        a[ssym] = int(a[ssym], 8)
+splited = num.split()
 
-print(a)
+
+for sym in range(0, len(splited)): # преобразую числа в 10ную систему все
+    if splited[sym].isdigit():
+        splited[sym] = int(splited[sym])
+    elif splited[sym].startswith('0x'):
+        splited[sym] = int(splited[sym], 16)
+    elif splited[sym].startswith('0o'):
+        splited[sym] = int(splited[sym], 8)
+print(splited)
+
+
+priority = {'**': 1, '*': 2, '/': 2, '+': 3, '-': 3}
+flag = True
+while flag == True: # сначала вычисляю все возведения в степень
+    for indx in range(0, len(splited)):
+        if splited[indx] == '**':
+            new_num = calculate(splited[indx - 1], splited[indx + 1], splited[indx])
+            splited[indx - 1] = new_num
+            del splited[indx:indx + 2]
+            if '**' not in splited:
+                flag = False
+                break
+print(splited)
+flag = True
+while flag == True: # затем вычисляю деление и умножение
+    for indx in range(0, len(splited)):
+        if splited[indx] == '/':
+            new_num = calculate(splited[indx - 1], splited[indx + 1], splited[indx])
+            splited[indx - 1] = new_num
+            del splited[indx:indx + 2]
+        elif splited[indx] == '*':
+            new_num = calculate(splited[indx - 1], splited[indx + 1], splited[indx])
+            splited[indx - 1] = new_num
+            del splited[indx:indx + 2]
+        if '*' not in splited and '/' not in splited:
+            flag = False
+            break
+print(splited)
+
+flag = True
+while flag == True:  # затем вычисляю сложение и вычитание
+    for indx in range(0, len(splited)):
+        if splited[indx] == '-':
+            new_num = calculate(splited[indx - 1], splited[indx + 1], splited[indx])
+            splited[indx - 1] = new_num
+            del splited[indx:indx + 2]
+        elif splited[indx] == '+':
+            new_num = calculate(splited[indx - 1], splited[indx + 1], splited[indx])
+            splited[indx - 1] = new_num
+            del splited[indx:indx + 2]
+        if len(splited) == 3:
+            flag = False
+            break
+print(splited)
+
+
+
+
 
 
 
